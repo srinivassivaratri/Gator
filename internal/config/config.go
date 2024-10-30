@@ -17,6 +17,11 @@ type Config struct {
 	CurrentUserName string `json:"current_user_name"` // Current user's name
 }
 
+type state struct {
+	// it holds a pointer to a Config struct
+	Cfg *Config
+}
+
 // SetUser is a method on Config that updates the username and saves to file
 func (cfg *Config) SetUser(username string) error {
 	// Update the username in our config struct

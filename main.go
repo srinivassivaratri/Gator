@@ -5,9 +5,14 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/srinivassivaratri/RSSAggregator/internal/config"
 )
+
+type state struct {
+	cfg *config.Config
+}
 
 // Main function - program starts here
 func main() {
@@ -17,21 +22,27 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error reading config: %v", err)
 	}
-	// Print the initial config values using %+v to show field names
-	fmt.Printf("Initial read config: %+v\n", cfg)
-
-	// Update username to "srinivas" and save to config file
-	if err := cfg.SetUser("srinivas"); err != nil {
-		// If saving fails, log error and exit
-		log.Fatal(err)
+	programState := &state{
+		cfg: &cfg,
 	}
 
-	// Read the config file again to verify changes
-	updatedCfg, err := config.Read()
-	// If reading fails, log error and exit
+	cmds := commands{
+		registeredCommands: make(map[string]func(*state, command) error),
+	}
+	cmds.register("login", handlerLogin)
+	// Get command line args (excluding program name)
+	if len(os.Args) < 2 {
+		fmt.Println("Usage: cli <command> [args...]")
+		os.Exit(1) // Exit with status code 1 when no command provided
+	}
+
+	// Create command from args
+	cmdName := os.Args[1]
+	cmdArgs := os.Args[2:]
+
+	// Run the command
+	err = cmds.run(programState, command{Name: cmdName, Args: cmdArgs})
 	if err != nil {
-		log.Fatalf("Error reading config: %v", err)
+		log.Fatalf("Error running command: %v", err)
 	}
-	// Print the updated config to show changes
-	fmt.Printf("Updated config: %+v\n", updatedCfg)
 }
