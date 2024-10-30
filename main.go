@@ -1,39 +1,50 @@
-// Declares the main package - entry point for the program
 package main
 
-// Import required packages for I/O and configuration handling
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"os"
 
+	_ "github.com/lib/pq"
+
 	"github.com/srinivassivaratri/RSSAggregator/internal/config"
+	"github.com/srinivassivaratri/RSSAggregator/internal/database"
 )
 
 type state struct {
+	db  *database.Queries
 	cfg *config.Config
 }
 
-// Main function - program starts here
 func main() {
-	// Try to read the config file into cfg variable
 	cfg, err := config.Read()
-	// If reading fails, log the error and exit program
 	if err != nil {
 		log.Fatalf("Error reading config: %v", err)
 	}
+
+	db, err := sql.Open("postgres", cfg.DBURL)
+	if err != nil {
+		log.Fatalf("Error connecting to database: %v", err)
+	}
+	defer db.Close()
+
+	dbQueries := database.New(db)
 	programState := &state{
 		cfg: &cfg,
+		db:  dbQueries,
 	}
 
 	cmds := commands{
 		registeredCommands: make(map[string]func(*state, command) error),
 	}
 	cmds.register("login", handlerLogin)
+	cmds.register("register", handlerRegister)
+
 	// Get command line args (excluding program name)
 	if len(os.Args) < 2 {
 		fmt.Println("Usage: cli <command> [args...]")
-		os.Exit(1) // Exit with status code 1 when no command provided
+		return
 	}
 
 	// Create command from args

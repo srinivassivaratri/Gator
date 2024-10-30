@@ -13,21 +13,41 @@ Build an RSS feed reader
 
 ## Plan
 1. Config system ✓
+   - JSON file storage
+   - User settings management
+   - Database connection info
 2. CLI command system ✓
+   - Command registration
+   - Argument handling
+   - Error management
 3. Database setup ✓
    - Users table with UUID, timestamps, and unique names
    - Local PostgreSQL instance
    - Goose migrations
-4. RSS handler
-5. API layer
+4. User management ✓
+   - Register new users
+   - Login existing users
+   - Config file user tracking
+5. RSS handler (TODO)
+6. API layer (TODO)
 
 ## Code
 - `main.go`: Entry point with CLI command handling
 - `commands.go`: Command registration and execution system
 - `handler_user.go`: User-related command handlers
-- `internal/config/config.go`: Handles reading/writing config file
-  - Uses JSON for storage
-  - Stores in ~/.gatorconfig.json
-  - Manages DB URL with SSL config and username
+- `internal/config/config.go`: Config file management
+- `internal/database/`: Generated database code
 - `sql/schema/`: Database migrations
-  - `001_users.sql`: Creates users table with UUID and timestamps
+- `sql/queries/`: SQL queries for SQLC
+
+## Setup
+```bash
+# Database setup
+sudo -u postgres psql -c "DROP DATABASE IF EXISTS gator;"
+sudo -u postgres psql -c "CREATE DATABASE gator;"
+sudo -u postgres psql -d gator -c "GRANT ALL PRIVILEGES ON DATABASE gator TO postgres;"
+sudo -u postgres psql -d gator -c "GRANT ALL PRIVILEGES ON SCHEMA public TO postgres;"
+sudo -u postgres psql -d gator -c "ALTER SCHEMA public OWNER TO postgres;"
+
+# Run migrations
+goose -dir sql/schema postgres "postgres://postgres:postgres@localhost:5432/gator?sslmode=disable" up
