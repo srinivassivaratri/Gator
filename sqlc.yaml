@@ -1,8 +1,12 @@
 version: "2"
 sql:
-  - schema: "sql/schema"
-    queries: "sql/queries"
-    engine: "postgresql"
+  - schema: "sql/schema"     # Where we define our data structure
+    queries: "sql/queries"   # Where we define how to interact with data
+    engine: "postgresql"     # PostgreSQL chosen for ACID compliance and JSON support
     gen:
       go:
+        # Generated code gives us:
+        # 1. Type safety (catch errors at compile time)
+        # 2. SQL injection protection
+        # 3. Automatic mapping between DB and Go types
         out: "internal/database"

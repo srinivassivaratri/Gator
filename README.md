@@ -1,9 +1,11 @@
 # RSSAggregator
 
 ## Task
+# Main goal of the project
 Build an RSS feed reader
 
 ## Spec
+# Core requirements and features
 - Store user settings in JSON config file (~/.gatorconfig.json)
 - Save DB connection URL with SSL disabled for local development
 - Save current username
@@ -12,6 +14,7 @@ Build an RSS feed reader
 - PostgreSQL database with UUID primary keys
 
 ## Plan
+# Project roadmap broken into phases
 1. Config system ✓
    - JSON file storage ✓
    - User settings management ✓
@@ -40,6 +43,7 @@ Build an RSS feed reader
    - User authentication
 
 ## Code
+# Project structure and file purposes
 - `main.go`: Entry point with CLI command handling
 - `commands.go`: Command registration and execution system
 - `handler_user.go`: User-related command handlers
@@ -50,6 +54,7 @@ Build an RSS feed reader
 - `sql/queries/`: SQL queries for SQLC
 
 ## Setup (Local PostgreSQL)
+# Step-by-step database setup instructions
 ```bash
 # Create local PostgreSQL directories
 mkdir -p ~/postgres_data ~/postgres_run
@@ -70,6 +75,7 @@ goose -dir sql/schema postgres "postgres://postgres:postgres@localhost:5433/gato
 ```
 
 ## Troubleshooting
+# Common issues and solutions
 If you get connection errors:
 1. Check PostgreSQL status: `/usr/lib/postgresql/17/bin/pg_ctl -D ~/postgres_data status`
 2. Start PostgreSQL if needed: `/usr/lib/postgresql/17/bin/pg_ctl -D ~/postgres_data -o "-k /home/srinivas/postgres_run -p 5433" -l ~/postgres_data/logfile start`

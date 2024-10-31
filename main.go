@@ -10,55 +10,78 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// state holds core dependencies needed throughout the application
+// Using a struct instead of globals makes the app more testable
 type state struct {
-	db  *database.Queries // Holds database query functions to interact with PostgreSQL
-	cfg *config.Config    // Stores app configuration like database connection URL
+	// db holds all our database operations
+	// Using Queries type from generated sqlc code for type safety
+	db  *database.Queries
+	// cfg holds user preferences and DB connection info
+	// Pointer because we need to modify it
+	cfg *config.Config
 }
 
 func main() {
+	// Load user settings from ~/.gatorconfig.json
+	// This contains database URL and current user
 	cfg, err := config.Read()
 	if err != nil {
+		// If config can't be read, print error and exit with status 1
 		fmt.Fprintf(os.Stderr, "error reading config: %v\n", err)
 		os.Exit(1)
 	}
 
+	// Open connection to PostgreSQL using config URL
+	// sql.Open validates URL but doesn't actually connect yet
 	db, err := sql.Open("postgres", cfg.DBURL)
 	if err != nil {
+		// If DB URL is invalid, print error and exit
 		fmt.Fprintf(os.Stderr, "error connecting to db: %v\n", err)
 		os.Exit(1)
 	}
+	// Ensure DB connection is closed when program exits
 	defer db.Close()
+	// Create wrapper for type-safe database operations
 	dbQueries := database.New(db)
 
+	// Create program state with all dependencies
+	// This will be passed to command handlers
 	programState := &state{
 		db:  dbQueries,
 		cfg: &cfg,
 	}
 
+	// Initialize command system
+	// commands struct holds all registered CLI commands
 	cmds := commands{
+		// Map command names to their handler functions
+		// e.g., "register" -> handlerRegister
 		registeredCommands: make(map[string]func(*state, command) error),
 	}
-	cmds.register("login", handlerLogin)
-	cmds.register("register", handlerRegister)
-	cmds.register("reset", handlerReset)
-	cmds.register("users", handlerUsers)
+	// Register all available commands
+	cmds.register("login", handlerLogin)       // Switch current user
+	cmds.register("register", handlerRegister) // Create new user
+	cmds.register("reset", handlerReset)       // Clear database
+	cmds.register("users", handlerUsers)       // List all users
 
-	// When you run the program:
-	// 1. Reads config from ~/.gatorconfig.json
-	// 2. Connects to PostgreSQL database
-	// 3. Sets up command handlers
-	// 4. Waits for CLI command
-
+	// Check if user provided a command
+	// os.Args[0] is program name, need at least one more arg
 	if len(os.Args) < 2 {
+		// If no command provided, show usage and exit
 		fmt.Println("Usage: cli <command> [args...]")
 		os.Exit(1)
 	}
 
+	// Parse command line arguments
+	// First argument after program name is command
 	cmdName := os.Args[1]
+	// Remaining arguments are command parameters
 	cmdArgs := os.Args[2:]
 
+	// Execute the requested command
 	err = cmds.run(programState, command{Name: cmdName, Args: cmdArgs})
 	if err != nil {
+		// If command fails, print error and exit with status 1
 		fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(1)
 	}

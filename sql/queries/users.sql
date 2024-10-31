@@ -1,21 +1,19 @@
--- name: CreateUser :one
+-- Creates a new user (returns the created user)
 INSERT INTO users (id, created_at, updated_at, name)
 VALUES (
-    $1,
-    $2,
-    $3,
-    $4
+    $1, -- UUID
+    $2, -- Created timestamp
+    $3, -- Updated timestamp
+    $4  -- Username
 )
 RETURNING *;
 
-
--- name: GetUser :one
+-- Finds user by name (returns one user)
 SELECT * FROM users
 WHERE name = $1;
 
-
--- name: DeleteAllUsers :exec
+-- Removes all users (returns nothing)
 DELETE FROM users;
 
--- name: GetAllUsers :many
+-- Gets all users (returns multiple users)
 SELECT * FROM users;
