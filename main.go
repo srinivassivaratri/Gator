@@ -11,8 +11,8 @@ import (
 )
 
 type state struct {
-	db  *database.Queries
-	cfg *config.Config
+	db  *database.Queries // Holds database query functions to interact with PostgreSQL
+	cfg *config.Config    // Stores app configuration like database connection URL
 }
 
 func main() {
@@ -42,6 +42,12 @@ func main() {
 	cmds.register("register", handlerRegister)
 	cmds.register("reset", handlerReset)
 	cmds.register("users", handlerUsers)
+
+	// When you run the program:
+	// 1. Reads config from ~/.gatorconfig.json
+	// 2. Connects to PostgreSQL database
+	// 3. Sets up command handlers
+	// 4. Waits for CLI command
 
 	if len(os.Args) < 2 {
 		fmt.Println("Usage: cli <command> [args...]")
