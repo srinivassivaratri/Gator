@@ -1,87 +1,82 @@
 # RSSAggregator
 
-A simple RSS feed reader with user management.
+A tool that helps you follow websites by collecting their updates in one place.
 
-## Features
+## What it does now
 
-- User management via CLI
-- PostgreSQL storage with UUID keys
-- JSON config for settings
-- Clean command system
+- Create users
+- Switch between users
+- Store everything safely in PostgreSQL
+- Remember your settings between uses
 
-## Setup
+## Quick start
 
-1. **Create PostgreSQL directories**
+1. **Set up storage**
 ```bash
+# Make folders for database
 mkdir -p ~/postgres_data ~/postgres_run
-```
 
-2. **Initialize database**
-```bash
+# Start up PostgreSQL
 /usr/lib/postgresql/17/bin/initdb -D ~/postgres_data
-```
-
-3. **Start PostgreSQL**
-```bash
 /usr/lib/postgresql/17/bin/pg_ctl -D ~/postgres_data \
   -o "-k /home/srinivas/postgres_run -p 5433" \
   -l ~/postgres_data/logfile start
 ```
 
-4. **Setup database**
+2. **Create database**
 ```bash
-# Create DB
+# Make a new database called 'gator'
 PGPORT=5433 PGHOST=/home/srinivas/postgres_run \
   /usr/lib/postgresql/17/bin/createdb gator
 
-# Create user
+# Set up permissions
 PGPORT=5433 PGHOST=/home/srinivas/postgres_run \
   /usr/lib/postgresql/17/bin/psql -d gator \
   -c "CREATE USER postgres WITH PASSWORD 'postgres' SUPERUSER;"
 
-# Grant privileges
+# Let our user access it
 PGPORT=5433 PGHOST=/home/srinivas/postgres_run \
   /usr/lib/postgresql/17/bin/psql -d gator \
   -c "GRANT ALL PRIVILEGES ON DATABASE gator TO postgres;"
 
-# Run migrations
+# Set up tables
 goose -dir sql/schema \
   postgres "postgres://postgres:postgres@localhost:5433/gator?sslmode=disable" up
 ```
 
-## Project Structure
+## How it's built
 
 ```
 .
-├── main.go           # Entry point
-├── commands.go       # CLI command system
-├── handler_user.go   # User operations
-├── handler_reset.go  # DB reset
-├── internal/
-│   ├── config/      # Settings management
-│   └── database/    # Generated DB code
+├── main.go           # Starting point
+├── commands.go       # Handles CLI commands
+├── handler_user.go   # User management
+├── handler_reset.go  # Database cleanup
+├── internal/        
+│   ├── config/      # Saves your settings
+│   └── database/    # Talks to PostgreSQL
 └── sql/
-    ├── schema/      # DB migrations
-    └── queries/     # SQL queries
+    ├── schema/      # Database structure
+    └── queries/     # Database operations
 ```
 
-## Roadmap
+## What's next
 
-- [x] Config system
-- [x] CLI commands
+- [x] Save user settings
+- [x] Basic commands
 - [x] Database setup
-- [x] User management
-- [ ] RSS handler
-- [ ] API layer
+- [x] User system
+- [ ] RSS reading
+- [ ] Web API
 
-## Troubleshooting
+## If something breaks
 
-If connection fails:
+Run these commands:
 ```bash
-# Check status
+# Is database running?
 /usr/lib/postgresql/17/bin/pg_ctl -D ~/postgres_data status
 
-# Start if needed
+# Start it if needed
 /usr/lib/postgresql/17/bin/pg_ctl -D ~/postgres_data \
   -o "-k /home/srinivas/postgres_run -p 5433" \
   -l ~/postgres_data/logfile start
@@ -90,6 +85,6 @@ If connection fails:
 PGPORT=5433 PGHOST=/home/srinivas/postgres_run \
   /usr/lib/postgresql/17/bin/psql -d gator
 
-# Check logs
+# Check error logs
 cat ~/postgres_data/logfile
 ```
