@@ -3,11 +3,10 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"os"
 
-	"github.com/bootdotdev/gator/internal/config"
-	"github.com/bootdotdev/gator/internal/database"
+	"github.com/srinivassivaratri/RSSAggregator/internal/config"
+	"github.com/srinivassivaratri/RSSAggregator/internal/database"
 	_ "github.com/lib/pq"
 )
 
@@ -19,12 +18,14 @@ type state struct {
 func main() {
 	cfg, err := config.Read()
 	if err != nil {
-		log.Fatalf("error reading config: %v", err)
+		fmt.Fprintf(os.Stderr, "error reading config: %v\n", err)
+		os.Exit(1)
 	}
 
 	db, err := sql.Open("postgres", cfg.DBURL)
 	if err != nil {
-		log.Fatalf("error connecting to db: %v", err)
+		fmt.Fprintf(os.Stderr, "error connecting to db: %v\n", err)
+		os.Exit(1)
 	}
 	defer db.Close()
 	dbQueries := database.New(db)
@@ -40,10 +41,11 @@ func main() {
 	cmds.register("login", handlerLogin)
 	cmds.register("register", handlerRegister)
 	cmds.register("reset", handlerReset)
+	cmds.register("users", handlerUsers)
 
 	if len(os.Args) < 2 {
 		fmt.Println("Usage: cli <command> [args...]")
-		return
+		os.Exit(1)
 	}
 
 	cmdName := os.Args[1]
@@ -51,6 +53,7 @@ func main() {
 
 	err = cmds.run(programState, command{Name: cmdName, Args: cmdArgs})
 	if err != nil {
-		log.Fatal(err)
+		fmt.Fprintf(os.Stderr, "%v\n", err)
+		os.Exit(1)
 	}
 }

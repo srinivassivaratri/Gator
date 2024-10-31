@@ -13,28 +13,37 @@ Build an RSS feed reader
 
 ## Plan
 1. Config system ✓
-   - JSON file storage
-   - User settings management
-   - Database connection info
+   - JSON file storage ✓
+   - User settings management ✓
+   - Database connection info ✓
 2. CLI command system ✓
-   - Command registration
-   - Argument handling
-   - Error management
+   - Command registration ✓
+   - Argument handling ✓
+   - Error management ✓
 3. Database setup ✓
-   - Users table with UUID, timestamps, and unique names
-   - Local PostgreSQL instance
-   - Goose migrations
+   - Users table with UUID, timestamps, and unique names ✓
+   - Local PostgreSQL instance ✓
+   - Goose migrations ✓
 4. User management ✓
-   - Register new users
-   - Login existing users
-   - Config file user tracking
+   - Register new users ✓
+   - Login existing users ✓
+   - Config file user tracking ✓
+   - List users command ✓
+   - Reset database command ✓
 5. RSS handler (TODO)
+   - Feed table setup
+   - Feed post storage
+   - Feed fetching logic
 6. API layer (TODO)
+   - RESTful endpoints
+   - Feed management
+   - User authentication
 
 ## Code
 - `main.go`: Entry point with CLI command handling
 - `commands.go`: Command registration and execution system
 - `handler_user.go`: User-related command handlers
+- `handler_reset.go`: Database reset functionality
 - `internal/config/config.go`: Config file management
 - `internal/database/`: Generated database code
 - `sql/schema/`: Database migrations
