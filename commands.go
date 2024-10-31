@@ -15,6 +15,7 @@ type commands struct {
 	registeredCommands map[string]func(*state, command) error
 }
 
+
 func (c *commands) register(name string, f func(*state, command) error) {
 	// This method registers a new handler function for a command name.
 	c.registeredCommands[name] = f

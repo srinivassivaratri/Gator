@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/google/uuid"
@@ -20,12 +19,10 @@ func handlerRegister(s *state, cmd command) error {
 
 	// First check if user exists
 	_, err := s.db.GetUser(context.Background(), name)
-	fmt.Printf("Debug - GetUser error: %v\n", err)
 	if err == nil {
-		fmt.Printf("User %s already exists\n", name)
-		os.Exit(1)
+		return fmt.Errorf("user %s already exists", name)
 	} else if err != sql.ErrNoRows {
-		return fmt.Errorf("error checking user: %w", err)
+		return fmt.Errorf("error checking user: %v", err)
 	}
 
 	user, err := s.db.CreateUser(context.Background(), database.CreateUserParams{
@@ -35,12 +32,12 @@ func handlerRegister(s *state, cmd command) error {
 		Name:      name,
 	})
 	if err != nil {
-		return fmt.Errorf("couldn't create user: %w", err)
+		return fmt.Errorf("error creating user: %v", err)
 	}
 
 	err = s.cfg.SetUser(user.Name)
 	if err != nil {
-		return fmt.Errorf("couldn't set current user: %w", err)
+		return fmt.Errorf("error setting current user: %v", err)
 	}
 
 	fmt.Println("User created successfully:")
@@ -57,8 +54,7 @@ func handlerLogin(s *state, cmd command) error {
 	_, err := s.db.GetUser(context.Background(), name)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			fmt.Printf("User %s does not exist\n", name)
-			os.Exit(1)
+			return fmt.Errorf("user %s does not exist", name)
 		}
 		return fmt.Errorf("couldn't find user: %w", err)
 	}

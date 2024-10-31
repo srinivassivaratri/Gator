@@ -40,14 +40,29 @@ Build an RSS feed reader
 - `sql/schema/`: Database migrations
 - `sql/queries/`: SQL queries for SQLC
 
-## Setup
+## Setup (Local PostgreSQL)
 ```bash
-# Database setup
-sudo -u postgres psql -c "DROP DATABASE IF EXISTS gator;"
-sudo -u postgres psql -c "CREATE DATABASE gator;"
-sudo -u postgres psql -d gator -c "GRANT ALL PRIVILEGES ON DATABASE gator TO postgres;"
-sudo -u postgres psql -d gator -c "GRANT ALL PRIVILEGES ON SCHEMA public TO postgres;"
-sudo -u postgres psql -d gator -c "ALTER SCHEMA public OWNER TO postgres;"
+# Create local PostgreSQL directories
+mkdir -p ~/postgres_data ~/postgres_run
+
+# Initialize PostgreSQL database
+/usr/lib/postgresql/17/bin/initdb -D ~/postgres_data
+
+# Start PostgreSQL on port 5433
+/usr/lib/postgresql/17/bin/pg_ctl -D ~/postgres_data -o "-k /home/srinivas/postgres_run -p 5433" -l ~/postgres_data/logfile start
+
+# Create database and set up permissions
+PGPORT=5433 PGHOST=/home/srinivas/postgres_run /usr/lib/postgresql/17/bin/createdb gator
+PGPORT=5433 PGHOST=/home/srinivas/postgres_run /usr/lib/postgresql/17/bin/psql -d gator -c "CREATE USER postgres WITH PASSWORD 'postgres' SUPERUSER;"
+PGPORT=5433 PGHOST=/home/srinivas/postgres_run /usr/lib/postgresql/17/bin/psql -d gator -c "GRANT ALL PRIVILEGES ON DATABASE gator TO postgres;"
 
 # Run migrations
-goose -dir sql/schema postgres "postgres://postgres:postgres@localhost:5432/gator?sslmode=disable" up
+goose -dir sql/schema postgres "postgres://postgres:postgres@localhost:5433/gator?sslmode=disable" up
+```
+
+## Troubleshooting
+If you get connection errors:
+1. Check PostgreSQL status: `/usr/lib/postgresql/17/bin/pg_ctl -D ~/postgres_data status`
+2. Start PostgreSQL if needed: `/usr/lib/postgresql/17/bin/pg_ctl -D ~/postgres_data -o "-k /home/srinivas/postgres_run -p 5433" -l ~/postgres_data/logfile start`
+3. Verify connection: `PGPORT=5433 PGHOST=/home/srinivas/postgres_run /usr/lib/postgresql/17/bin/psql -d gator`
+4. Check logs: `cat ~/postgres_data/logfile`
