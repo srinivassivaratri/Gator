@@ -18,7 +18,8 @@ Build a command-line RSS feed aggregator that helps users follow multiple websit
 3. Add database integration
 4. Create configuration system
 5. Add RSS feed fetching and parsing
-6. Build web API (upcoming)
+6. Add feed management commands
+7. Build web API (upcoming)
 
 ## Code
 
@@ -30,7 +31,8 @@ Build a command-line RSS feed aggregator that helps users follow multiple websit
 ├── handler_user.go   # User management
 ├── handler_reset.go  # Database cleanup
 ├── handler_agg.go    # RSS feed aggregation
-├── feed.go           # RSS feed parsing
+├── handler_feed.go   # Feed management
+├── rss_feed.go      # RSS feed parsing
 ├── internal/        
 │   ├── config/      # Saves your settings
 │   └── database/    # Talks to PostgreSQL
@@ -38,6 +40,14 @@ Build a command-line RSS feed aggregator that helps users follow multiple websit
     ├── schema/      # Database structure
     └── queries/     # Database operations
 ```
+
+### Available Commands
+- `register <name>` - Create a new user
+- `login <name>` - Switch to existing user
+- `users` - List all users
+- `reset` - Clear database
+- `addfeed <name> <url>` - Add a new RSS feed
+- `agg` - Test feed aggregation
 
 ### Setup Instructions
 
@@ -80,6 +90,7 @@ goose -dir sql/schema \
 - [x] Database setup
 - [x] User system
 - [x] RSS reading
+- [x] Feed management
 - [ ] Web API
 
 ### Troubleshooting
