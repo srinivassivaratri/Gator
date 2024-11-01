@@ -2,14 +2,44 @@
 
 A tool that helps you follow websites by collecting their updates in one place.
 
-## What it does now
+## Task
+Build a command-line RSS feed aggregator that helps users follow multiple websites and get updates in one place.
 
-- Create users
-- Switch between users
-- Store everything safely in PostgreSQL
-- Remember your settings between uses
+## Spec
+- Users can register and switch between accounts
+- Settings persist between sessions
+- Data stored securely in PostgreSQL
+- Fetch and parse RSS feeds
+- Clean command-line interface
 
-## Quick start
+## Plan
+1. Set up basic project structure
+2. Implement user management system
+3. Add database integration
+4. Create configuration system
+5. Add RSS feed fetching and parsing
+6. Build web API (upcoming)
+
+## Code
+
+### Project Structure
+```
+.
+├── main.go           # Starting point
+├── commands.go       # Handles CLI commands
+├── handler_user.go   # User management
+├── handler_reset.go  # Database cleanup
+├── handler_agg.go    # RSS feed aggregation
+├── feed.go           # RSS feed parsing
+├── internal/        
+│   ├── config/      # Saves your settings
+│   └── database/    # Talks to PostgreSQL
+└── sql/
+    ├── schema/      # Database structure
+    └── queries/     # Database operations
+```
+
+### Setup Instructions
 
 1. **Set up storage**
 ```bash
@@ -44,34 +74,17 @@ goose -dir sql/schema \
   postgres "postgres://postgres:postgres@localhost:5433/gator?sslmode=disable" up
 ```
 
-## How it's built
-
-```
-.
-├── main.go           # Starting point
-├── commands.go       # Handles CLI commands
-├── handler_user.go   # User management
-├── handler_reset.go  # Database cleanup
-├── internal/        
-│   ├── config/      # Saves your settings
-│   └── database/    # Talks to PostgreSQL
-└── sql/
-    ├── schema/      # Database structure
-    └── queries/     # Database operations
-```
-
-## What's next
-
+### Progress
 - [x] Save user settings
 - [x] Basic commands
 - [x] Database setup
 - [x] User system
-- [ ] RSS reading
+- [x] RSS reading
 - [ ] Web API
 
-## If something breaks
+### Troubleshooting
 
-Run these commands:
+If something breaks, run these commands:
 ```bash
 # Is database running?
 /usr/lib/postgresql/17/bin/pg_ctl -D ~/postgres_data status

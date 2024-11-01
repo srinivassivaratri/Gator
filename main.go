@@ -63,6 +63,7 @@ func main() {
 	cmds.register("register", handlerRegister) // Create new user
 	cmds.register("reset", handlerReset)       // Clear database
 	cmds.register("users", handlerUsers)       // List all users
+	cmds.register("agg", handlerAgg)          // Test feed aggregation
 
 	// Check if user provided a command
 	// os.Args[0] is program name, need at least one more arg
