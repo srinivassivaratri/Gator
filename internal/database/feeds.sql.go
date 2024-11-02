@@ -63,11 +63,11 @@ func (q *Queries) DeleteFeed(ctx context.Context, arg DeleteFeedParams) error {
 }
 
 const getFeeds = `-- name: GetFeeds :many
-SELECT id, created_at, updated_at, name, url, user_id FROM feeds WHERE user_id = $1
+SELECT id, created_at, updated_at, name, url, user_id FROM feeds
 `
 
-func (q *Queries) GetFeeds(ctx context.Context, userID uuid.UUID) ([]Feed, error) {
-	rows, err := q.db.QueryContext(ctx, getFeeds, userID)
+func (q *Queries) GetFeeds(ctx context.Context) ([]Feed, error) {
+	rows, err := q.db.QueryContext(ctx, getFeeds)
 	if err != nil {
 		return nil, err
 	}
@@ -82,6 +82,61 @@ func (q *Queries) GetFeeds(ctx context.Context, userID uuid.UUID) ([]Feed, error
 			&i.Name,
 			&i.Url,
 			&i.UserID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getFeedsWithUser = `-- name: GetFeedsWithUser :many
+SELECT 
+    feeds.id,
+    feeds.created_at,
+    feeds.updated_at,
+    feeds.name,
+    feeds.url,
+    feeds.user_id,
+    users.name as user_name
+FROM feeds
+JOIN users ON feeds.user_id = users.id
+WHERE feeds.user_id = $1
+`
+
+type GetFeedsWithUserRow struct {
+	ID        uuid.UUID
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Name      string
+	Url       string
+	UserID    uuid.UUID
+	UserName  string
+}
+
+func (q *Queries) GetFeedsWithUser(ctx context.Context, userID uuid.UUID) ([]GetFeedsWithUserRow, error) {
+	rows, err := q.db.QueryContext(ctx, getFeedsWithUser, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetFeedsWithUserRow
+	for rows.Next() {
+		var i GetFeedsWithUserRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Name,
+			&i.Url,
+			&i.UserID,
+			&i.UserName,
 		); err != nil {
 			return nil, err
 		}

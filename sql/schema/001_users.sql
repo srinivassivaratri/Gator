@@ -1,10 +1,14 @@
--- Creates users table when running migrations up
+-- +goose Up
+-- +goose StatementBegin
 CREATE TABLE users (
-    id UUID PRIMARY KEY,          -- Unique ID for each user
-    created_at TIMESTAMP NOT NULL, -- When user was created
-    updated_at TIMESTAMP NOT NULL, -- When user was last updated
-    name TEXT NOT NULL UNIQUE     -- Username (must be unique)
+    id UUID PRIMARY KEY,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
+    name TEXT NOT NULL UNIQUE
 );
+-- +goose StatementEnd
 
--- Removes users table when running migrations down
+-- +goose Down
+-- +goose StatementBegin
 DROP TABLE users;
+-- +goose StatementEnd

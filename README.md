@@ -47,6 +47,7 @@ Build a command-line RSS feed aggregator that helps users follow multiple websit
 - `users` - List all users
 - `reset` - Clear database
 - `addfeed <name> <url>` - Add a new RSS feed
+- `feeds` - List all feeds with their owners
 - `agg` - Test feed aggregation
 
 ### Setup Instructions
@@ -91,6 +92,9 @@ goose -dir sql/schema \
 - [x] User system
 - [x] RSS reading
 - [x] Feed management
+  - [x] Add feeds
+  - [x] List feeds with owners
+  - [x] Database schema for feeds
 - [ ] Web API
 
 ### Troubleshooting

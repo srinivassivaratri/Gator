@@ -65,6 +65,7 @@ func main() {
 	cmds.register("users", handlerUsers)       // List all users
 	cmds.register("agg", handlerAgg)          // Test feed aggregation
 	cmds.register("addfeed", handlerCreateFeed)
+	cmds.register("feeds", handlerListFeeds)
 
 	// Check if user provided a command
 	// os.Args[0] is program name, need at least one more arg
