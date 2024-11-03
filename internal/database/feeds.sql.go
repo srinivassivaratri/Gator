@@ -116,12 +116,7 @@ func (q *Queries) GetFeeds(ctx context.Context) ([]Feed, error) {
 
 const getFeedsWithUser = `-- name: GetFeedsWithUser :many
 SELECT 
-    feeds.id,
-    feeds.created_at,
-    feeds.updated_at,
-    feeds.name,
-    feeds.url,
-    feeds.user_id,
+    feeds.id, feeds.created_at, feeds.updated_at, feeds.name, feeds.url, feeds.user_id,
     users.name as user_name
 FROM feeds
 JOIN users ON feeds.user_id = users.id
@@ -167,4 +162,36 @@ func (q *Queries) GetFeedsWithUser(ctx context.Context, userID uuid.UUID) ([]Get
 		return nil, err
 	}
 	return items, nil
+}
+
+const getNextFeedToFetch = `-- name: GetNextFeedToFetch :one
+SELECT id, created_at, updated_at, name, url, user_id FROM feeds 
+ORDER BY COALESCE(last_fetched_at, TIMESTAMP '1970-01-01') ASC
+LIMIT 1
+`
+
+func (q *Queries) GetNextFeedToFetch(ctx context.Context) (Feed, error) {
+	row := q.db.QueryRowContext(ctx, getNextFeedToFetch)
+	var i Feed
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Name,
+		&i.Url,
+		&i.UserID,
+	)
+	return i, err
+}
+
+const markFeedFetched = `-- name: MarkFeedFetched :exec
+UPDATE feeds
+SET last_fetched_at = NOW(),
+    updated_at = NOW()
+WHERE id = $1
+`
+
+func (q *Queries) MarkFeedFetched(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, markFeedFetched, id)
+	return err
 }

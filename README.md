@@ -107,6 +107,11 @@ goose -dir sql/schema \
   - [x] Protect feed-related endpoints
   - [x] DRY up authentication code
   - [x] Automatic user context injection
+- [x] Feed Aggregation
+  - [x] Track last fetch time
+  - [x] Continuous feed polling
+  - [x] Configurable fetch intervals
+  - [x] Smart feed rotation
 - [ ] Web API
 
 ### Troubleshooting
