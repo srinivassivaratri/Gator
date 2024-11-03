@@ -51,7 +51,8 @@ Build a command-line RSS feed aggregator that helps users follow multiple websit
 - `follow <url>` - Follow an existing feed (creates if not exists)
 - `unfollow <url>` - Unfollow a feed you're currently following
 - `following` - List all feeds you're following
-- `agg` - Test feed aggregation
+- `agg <time_between_reqs>` - Run feed aggregator (e.g., agg 1m)
+- `browse [limit]` - View recent posts (default: 2 posts)
 
 ### Setup Instructions
 
@@ -104,14 +105,16 @@ goose -dir sql/schema \
     - [x] Unfollow feeds
   - [x] Many-to-many user-feed relationships
 - [x] Authentication middleware
-  - [x] Protect feed-related endpoints
-  - [x] DRY up authentication code
-  - [x] Automatic user context injection
 - [x] Feed Aggregation
   - [x] Track last fetch time
   - [x] Continuous feed polling
   - [x] Configurable fetch intervals
   - [x] Smart feed rotation
+- [x] Post Management
+  - [x] Store posts in database
+  - [x] Handle duplicate posts
+  - [x] Parse publish dates
+  - [x] Browse recent posts
 - [ ] Web API
 
 ### Troubleshooting

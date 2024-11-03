@@ -2,9 +2,13 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
+	"strings"
 	"time"
+
+	"github.com/google/uuid"
 
 	"github.com/srinivassivaratri/RSSAggregator/internal/database"
 )
@@ -54,7 +58,33 @@ func scrapeFeeds(s *state) error {
 
 	fmt.Printf("Found %d posts in %s\n", len(rssFeed.Channel.Item), feed.Name)
 	for _, item := range rssFeed.Channel.Item {
-		fmt.Printf("- %s\n", item.Title)
+		publishedAt := sql.NullTime{}
+		if t, err := time.Parse(time.RFC1123Z, item.PubDate); err == nil {
+			publishedAt = sql.NullTime{
+				Time:  t,
+				Valid: true,
+			}
+		}
+
+		// Try to create post, ignore if URL already exists
+		_, err := s.db.CreatePost(context.Background(), database.CreatePostParams{
+			ID:        uuid.New(),
+			CreatedAt: time.Now().UTC(),
+			UpdatedAt: time.Now().UTC(),
+			Title:     item.Title,
+			Url:       item.Link,
+			Description: sql.NullString{
+				String: item.Description,
+				Valid:  item.Description != "",
+			},
+			PublishedAt: publishedAt,
+			FeedID:      feed.ID,
+		})
+		if err != nil {
+			if !strings.Contains(err.Error(), "duplicate key") {
+				log.Printf("couldn't create post: %v", err)
+			}
+		}
 	}
 	fmt.Println("------------------------")
 	return nil
