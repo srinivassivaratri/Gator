@@ -85,7 +85,10 @@ gator browse 5
 - `unfollow <url>` - Stop following a feed
 - `following` - List feeds you follow
 - `agg <interval>` - Start collecting posts (e.g., agg 1m)
-- `browse [limit]` - Read posts (default: 2 posts)
+- `browse [limit] [page]` - Read posts with pagination
+  - `browse` - Show 10 posts from page 1
+  - `browse 5` - Show 5 posts from page 1
+  - `browse 5 2` - Show 5 posts from page 2
 
 ## Features
 ✅ User Management
@@ -102,7 +105,10 @@ gator browse 5
   - Automatic fetching
   - Deduplication
   - Chronological order
-  - Configurable limits
+  - Smart pagination
+    - Configurable page size
+    - Next page hints
+    - Page navigation
 
 ✅ Data Storage
   - PostgreSQL backend

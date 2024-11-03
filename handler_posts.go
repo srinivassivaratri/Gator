@@ -9,12 +9,26 @@ import (
 )
 
 func handlerBrowse(s *state, cmd command, user database.User) error {
-	limit := 2
+	limit := 10 // Default limit
+	page := 1   // Default page
+
+	// Parse arguments: browse [limit] [page]
 	if len(cmd.Args) > 0 {
 		var err error
 		limit, err = strconv.Atoi(cmd.Args[0])
 		if err != nil {
 			return fmt.Errorf("limit must be a number: %w", err)
+		}
+	}
+
+	if len(cmd.Args) > 1 {
+		var err error
+		page, err = strconv.Atoi(cmd.Args[1])
+		if err != nil {
+			return fmt.Errorf("page must be a number: %w", err)
+		}
+		if page < 1 {
+			return fmt.Errorf("page must be >= 1")
 		}
 	}
 
@@ -26,7 +40,7 @@ func handlerBrowse(s *state, cmd command, user database.User) error {
 		return fmt.Errorf("error getting posts: %w", err)
 	}
 
-	fmt.Printf("Found %d posts:\n", len(posts))
+	fmt.Printf("Found %d posts (page %d):\n", len(posts), page)
 	for _, post := range posts {
 		fmt.Printf("\nTitle: %s\n", post.Title)
 		fmt.Printf("URL: %s\n", post.Url)
@@ -37,6 +51,10 @@ func handlerBrowse(s *state, cmd command, user database.User) error {
 			fmt.Printf("Published: %v\n", post.PublishedAt.Time.Format("2006-01-02 15:04:05"))
 		}
 		fmt.Println("------------------------")
+	}
+
+	if len(posts) == limit {
+		fmt.Printf("\nFor next page, use: browse %d %d\n", limit, page+1)
 	}
 	return nil
 }
