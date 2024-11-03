@@ -68,6 +68,7 @@ func main() {
 	cmds.register("follow", middlewareLoggedIn(handlerFollow))
 	cmds.register("following", middlewareLoggedIn(handlerFollowing))
 	cmds.register("agg", middlewareLoggedIn(handlerAgg))
+	cmds.register("unfollow", middlewareLoggedIn(handlerUnfollow))
 
 	// Check if user provided a command
 	// os.Args[0] is program name, need at least one more arg
