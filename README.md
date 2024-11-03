@@ -1,138 +1,149 @@
-# RSSAggregator
+# RSSAggregator (Gator)
 
-A tool that helps you follow websites by collecting their updates in one place.
+A simple command-line tool that helps you follow your favorite websites and get all their updates in one place. Think of it as your personal news feed aggregator!
 
-## Task
-Build a command-line RSS feed aggregator that helps users follow multiple websites and get updates in one place.
+## What does it do?
+- Follows RSS feeds from websites you like
+- Collects all posts in one place
+- Shows you updates right in your terminal
+- Keeps track of what you've read
+- Works with multiple user accounts
 
-## Spec
-- Users can register and switch between accounts
-- Settings persist between sessions
-- Data stored securely in PostgreSQL
-- Fetch and parse RSS feeds
-- Clean command-line interface
+## Prerequisites
+You'll need:
+- Go (1.22 or newer)
+- PostgreSQL (17 or newer)
 
-## Plan
-1. Set up basic project structure
-2. Implement user management system
-3. Add database integration
-4. Create configuration system
-5. Add RSS feed fetching and parsing
-6. Add feed management commands
-7. Build web API (upcoming)
+## Installation
 
-## Code
-
-### Project Structure
-```
-.
-├── main.go           # Starting point
-├── commands.go       # Handles CLI commands
-├── handler_user.go   # User management
-├── handler_reset.go  # Database cleanup
-├── handler_agg.go    # RSS feed aggregation
-├── handler_feed.go   # Feed management
-├── rss_feed.go      # RSS feed parsing
-├── internal/        
-│   ├── config/      # Saves your settings
-│   └── database/    # Talks to PostgreSQL
-└── sql/
-    ├── schema/      # Database structure
-    └── queries/     # Database operations
-```
-
-### Available Commands
-- `register <name>` - Create a new user
-- `login <name>` - Switch to existing user
-- `users` - List all users
-- `reset` - Clear database
-- `addfeed <name> <url>` - Add a new RSS feed
-- `feeds` - List all feeds with their owners
-- `follow <url>` - Follow an existing feed (creates if not exists)
-- `unfollow <url>` - Unfollow a feed you're currently following
-- `following` - List all feeds you're following
-- `agg <time_between_reqs>` - Run feed aggregator (e.g., agg 1m)
-- `browse [limit]` - View recent posts (default: 2 posts)
-
-### Setup Instructions
-
-1. **Set up storage**
+1. **Get the code**
 ```bash
-# Make folders for database
+go install github.com/yourusername/RSSAggregator@latest
+```
+
+2. **Set up config file**
+Create `~/.gatorconfig.json`:
+```json
+{
+    "db_url": "postgres://postgres:postgres@localhost:5433/gator?sslmode=disable",
+    "current_user_name": ""
+}
+```
+
+3. **Set up database**
+```bash
+# Create database folders
 mkdir -p ~/postgres_data ~/postgres_run
 
-# Start up PostgreSQL
+# Start PostgreSQL
 /usr/lib/postgresql/17/bin/initdb -D ~/postgres_data
 /usr/lib/postgresql/17/bin/pg_ctl -D ~/postgres_data \
   -o "-k /home/srinivas/postgres_run -p 5433" \
   -l ~/postgres_data/logfile start
-```
 
-2. **Create database**
-```bash
-# Make a new database called 'gator'
-PGPORT=5433 PGHOST=/home/srinivas/postgres_run \
-  /usr/lib/postgresql/17/bin/createdb gator
+# Create database
+PGPORT=5433 PGHOST=/home/srinivas/postgres_run createdb gator
 
 # Set up permissions
-PGPORT=5433 PGHOST=/home/srinivas/postgres_run \
-  /usr/lib/postgresql/17/bin/psql -d gator \
+PGPORT=5433 PGHOST=/home/srinivas/postgres_run psql -d gator \
   -c "CREATE USER postgres WITH PASSWORD 'postgres' SUPERUSER;"
 
-# Let our user access it
-PGPORT=5433 PGHOST=/home/srinivas/postgres_run \
-  /usr/lib/postgresql/17/bin/psql -d gator \
-  -c "GRANT ALL PRIVILEGES ON DATABASE gator TO postgres;"
-
-# Set up tables
-goose -dir sql/schema \
-  postgres "postgres://postgres:postgres@localhost:5433/gator?sslmode=disable" up
+# Run migrations
+goose -dir sql/schema postgres "postgres://postgres:postgres@localhost:5433/gator?sslmode=disable" up
 ```
 
-### Progress
-- [x] Save user settings
-- [x] Basic commands
-- [x] Database setup
-- [x] User system
-- [x] RSS reading
-- [x] Feed management
-  - [x] Add feeds
-  - [x] List feeds with owners
-  - [x] Database schema for feeds
-  - [x] Follow/unfollow feeds
-    - [x] Follow feeds
-    - [x] List follows
-    - [x] Unfollow feeds
-  - [x] Many-to-many user-feed relationships
-- [x] Authentication middleware
-- [x] Feed Aggregation
-  - [x] Track last fetch time
-  - [x] Continuous feed polling
-  - [x] Configurable fetch intervals
-  - [x] Smart feed rotation
-- [x] Post Management
-  - [x] Store posts in database
-  - [x] Handle duplicate posts
-  - [x] Parse publish dates
-  - [x] Browse recent posts
-- [ ] Web API
+## Quick Start
 
-### Troubleshooting
-
-If something breaks, run these commands:
+1. **Create your account**
 ```bash
-# Is database running?
+gator register myusername
+```
+
+2. **Follow some feeds**
+```bash
+# Follow some popular tech blogs
+gator follow "https://blog.boot.dev/index.xml"
+gator follow "https://news.ycombinator.com/rss"
+```
+
+3. **Start collecting posts**
+```bash
+# Fetch posts every minute
+gator agg 1m
+```
+
+4. **Browse your posts**
+```bash
+# Show latest 5 posts
+gator browse 5
+```
+
+## Available Commands
+- `register <name>` - Create your account
+- `login <name>` - Switch accounts
+- `follow <url>` - Follow a website's RSS feed
+- `unfollow <url>` - Stop following a feed
+- `following` - List feeds you follow
+- `agg <interval>` - Start collecting posts (e.g., agg 1m)
+- `browse [limit]` - Read posts (default: 2 posts)
+
+## Features
+✅ User Management
+  - Multiple accounts
+  - Easy switching
+  - Settings persist
+
+✅ Feed Management
+  - Follow/unfollow feeds
+  - List your follows
+  - Smart feed fetching
+
+✅ Post Collection
+  - Automatic fetching
+  - Deduplication
+  - Chronological order
+  - Configurable limits
+
+✅ Data Storage
+  - PostgreSQL backend
+  - Clean migrations
+  - Data persistence
+
+## Troubleshooting
+
+If something's not working:
+```bash
+# Check if database is running
 /usr/lib/postgresql/17/bin/pg_ctl -D ~/postgres_data status
 
-# Start it if needed
+# Start database if needed
 /usr/lib/postgresql/17/bin/pg_ctl -D ~/postgres_data \
   -o "-k /home/srinivas/postgres_run -p 5433" \
   -l ~/postgres_data/logfile start
 
-# Test connection
-PGPORT=5433 PGHOST=/home/srinivas/postgres_run \
-  /usr/lib/postgresql/17/bin/psql -d gator
-
-# Check error logs
+# Check database logs
 cat ~/postgres_data/logfile
 ```
+
+## Development
+
+Want to hack on Gator? Here's how:
+```bash
+# Get the code
+git clone https://github.com/yourusername/RSSAggregator.git
+
+# Build it
+go build
+
+# Run it (for development)
+go run .
+
+# Install it (for production)
+go install
+```
+
+## Contributing
+Pull requests welcome! Check out our issues page or add your own features.
+
+## License
+MIT - Do whatever you want with it!
