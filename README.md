@@ -99,6 +99,10 @@ goose -dir sql/schema \
   - [x] Database schema for feeds
   - [x] Follow/unfollow feeds
   - [x] Many-to-many user-feed relationships
+- [x] Authentication middleware
+  - [x] Protect feed-related endpoints
+  - [x] DRY up authentication code
+  - [x] Automatic user context injection
 - [ ] Web API
 
 ### Troubleshooting

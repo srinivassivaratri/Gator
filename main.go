@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"os"
 
+	_ "github.com/lib/pq"
 	"github.com/srinivassivaratri/RSSAggregator/internal/config"
 	"github.com/srinivassivaratri/RSSAggregator/internal/database"
-	_ "github.com/lib/pq"
 )
 
 // state holds core dependencies needed throughout the application
@@ -15,7 +15,7 @@ import (
 type state struct {
 	// db holds all our database operations
 	// Using Queries type from generated sqlc code for type safety
-	db  *database.Queries
+	db *database.Queries
 	// cfg holds user preferences and DB connection info
 	// Pointer because we need to modify it
 	cfg *config.Config
@@ -60,14 +60,14 @@ func main() {
 	}
 	// Register all available commands
 	cmds.register("register", handlerRegister) // Create new user
-	cmds.register("login", handlerLogin)     // Switch current user
-	cmds.register("reset", handlerReset)     // Clear database
-	cmds.register("users", handlerUsers)     // List all users
-	cmds.register("agg", handlerAgg)         // Test feed aggregation
-	cmds.register("addfeed", handlerCreateFeed)
+	cmds.register("login", handlerLogin)       // Switch current user
+	cmds.register("reset", handlerReset)       // Clear database
+	cmds.register("users", handlerUsers)       // List all users
+	cmds.register("addfeed", middlewareLoggedIn(handlerCreateFeed))
 	cmds.register("feeds", handlerListFeeds)
-	cmds.register("follow", handlerFollow)
-	cmds.register("following", handlerFollowing)
+	cmds.register("follow", middlewareLoggedIn(handlerFollow))
+	cmds.register("following", middlewareLoggedIn(handlerFollowing))
+	cmds.register("agg", middlewareLoggedIn(handlerAgg))
 
 	// Check if user provided a command
 	// os.Args[0] is program name, need at least one more arg
