@@ -1,41 +1,75 @@
-# RSSAggregator (Gator)
+# 🐊 Gator - Your Terminal RSS Feed Aggregator
 
-A simple command-line tool that helps you follow your favorite websites and get all their updates in one place. Think of it as your personal news feed aggregator!
+Gator is a powerful command-line RSS feed aggregator that brings all your favorite web content into one place. Built in Go, it helps you follow websites, collect their updates, and read them right in your terminal.
 
-## What does it do?
-- Follows RSS feeds from websites you like
-- Collects all posts in one place
-- Shows you updates right in your terminal
-- Keeps track of what you've read
-- Works with multiple user accounts
+## Why Gator?
 
-## Prerequisites
-You'll need:
-- Go (1.22 or newer)
-- PostgreSQL (17 or newer)
+RSS feeds are scattered across the web, making it hard to keep up with your favorite content. Most RSS readers are bloated web apps or desktop applications. I wanted something:
 
-## Installation
+- Lightning fast and lightweight
+- Usable entirely from the terminal
+- Multi-user friendly
+- With smart feed management
 
-1. **Get the code**
+Gator solves this by providing a simple CLI that just works. No browser needed, no fancy UI - just your content, when you want it.
+
+## 🚀 Quick Start
+
+1. **Install Gator**
 ```bash
 go install github.com/yourusername/RSSAggregator@latest
 ```
 
-2. **Set up config file**
-Create `~/.gatorconfig.json`:
-```json
-{
-    "db_url": "postgres://postgres:postgres@localhost:5433/gator?sslmode=disable",
-    "current_user_name": ""
-}
+2. **Create your account**
+```bash
+gator register myusername
 ```
 
-3. **Set up database**
+3. **Follow some feeds**
 ```bash
-# Create database folders
+gator follow "https://blog.boot.dev/index.xml"
+gator follow "https://news.ycombinator.com/rss"
+```
+
+4. **Start reading!**
+```bash
+gator browse
+```
+
+## 📖 Usage
+
+### Core Commands
+
+- `register <name>` - Create your account
+- `login <name>` - Switch between accounts
+- `follow <url>` - Follow a new RSS feed
+- `unfollow <url>` - Stop following a feed
+- `following` - List your followed feeds
+- `browse [limit] [page]` - Read posts with pagination
+  - `browse` - Show 10 posts from page 1
+  - `browse 5` - Show 5 posts from page 1
+  - `browse 5 2` - Show 5 posts from page 2
+- `agg <interval>` - Start collecting posts (e.g., `agg 1m`)
+
+### Feed Collection Options
+
+The `agg` command supports various time intervals:
+- `agg 30s` - Collect every 30 seconds
+- `agg 1m` - Collect every minute
+- `agg 1h` - Collect every hour
+
+## 🛠️ Development Setup
+
+### Prerequisites
+- Go 1.22+
+- PostgreSQL 17+
+
+### Database Setup
+```bash
+# Create database directories
 mkdir -p ~/postgres_data ~/postgres_run
 
-# Start PostgreSQL
+# Initialize and start PostgreSQL
 /usr/lib/postgresql/17/bin/initdb -D ~/postgres_data
 /usr/lib/postgresql/17/bin/pg_ctl -D ~/postgres_data \
   -o "-k /home/srinivas/postgres_run -p 5433" \
@@ -52,104 +86,32 @@ PGPORT=5433 PGHOST=/home/srinivas/postgres_run psql -d gator \
 goose -dir sql/schema postgres "postgres://postgres:postgres@localhost:5433/gator?sslmode=disable" up
 ```
 
-## Quick Start
-
-1. **Create your account**
-```bash
-gator register myusername
+### Configuration
+Create `~/.gatorconfig.json`:
+```json
+{
+    "db_url": "postgres://postgres:postgres@localhost:5433/gator?sslmode=disable",
+    "current_user_name": ""
+}
 ```
 
-2. **Follow some feeds**
+## 🤝 Contributing
+
+1. **Get the code**
 ```bash
-# Follow some popular tech blogs
-gator follow "https://blog.boot.dev/index.xml"
-gator follow "https://news.ycombinator.com/rss"
-```
-
-3. **Start collecting posts**
-```bash
-# Fetch posts every minute
-gator agg 1m
-```
-
-4. **Browse your posts**
-```bash
-# Show latest 5 posts
-gator browse 5
-```
-
-## Available Commands
-- `register <name>` - Create your account
-- `login <name>` - Switch accounts
-- `follow <url>` - Follow a website's RSS feed
-- `unfollow <url>` - Stop following a feed
-- `following` - List feeds you follow
-- `agg <interval>` - Start collecting posts (e.g., agg 1m)
-- `browse [limit] [page]` - Read posts with pagination
-  - `browse` - Show 10 posts from page 1
-  - `browse 5` - Show 5 posts from page 1
-  - `browse 5 2` - Show 5 posts from page 2
-
-## Features
-✅ User Management
-  - Multiple accounts
-  - Easy switching
-  - Settings persist
-
-✅ Feed Management
-  - Follow/unfollow feeds
-  - List your follows
-  - Smart feed fetching
-
-✅ Post Collection
-  - Automatic fetching
-  - Deduplication
-  - Chronological order
-  - Smart pagination
-    - Configurable page size
-    - Next page hints
-    - Page navigation
-
-✅ Data Storage
-  - PostgreSQL backend
-  - Clean migrations
-  - Data persistence
-
-## Troubleshooting
-
-If something's not working:
-```bash
-# Check if database is running
-/usr/lib/postgresql/17/bin/pg_ctl -D ~/postgres_data status
-
-# Start database if needed
-/usr/lib/postgresql/17/bin/pg_ctl -D ~/postgres_data \
-  -o "-k /home/srinivas/postgres_run -p 5433" \
-  -l ~/postgres_data/logfile start
-
-# Check database logs
-cat ~/postgres_data/logfile
-```
-
-## Development
-
-Want to hack on Gator? Here's how:
-```bash
-# Get the code
 git clone https://github.com/yourusername/RSSAggregator.git
-
-# Build it
-go build
-
-# Run it (for development)
-go run .
-
-# Install it (for production)
-go install
+cd RSSAggregator
 ```
 
-## Contributing
-Pull requests welcome! Check out our issues page or add your own features.
+2. **Build it**
+```bash
+go build
+```
 
-## License
-MIT - Do whatever you want with it!
+3. **Run tests**
+```bash
+go test ./...
+```
+
+4. Submit a PR with your changes!
+
