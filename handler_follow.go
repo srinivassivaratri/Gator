@@ -8,7 +8,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/srinivassivaratri/RSSAggregator/internal/database"
+	"github.com/srinivassivaratri/Gator/internal/database"
 )
 
 func handlerFollow(s *state, cmd command, user database.User) error {

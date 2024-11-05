@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/srinivassivaratri/RSSAggregator/internal/database"
+	"github.com/srinivassivaratri/Gator/internal/database"
 )
 
 // handlerRegister creates new user
@@ -99,6 +99,3 @@ func printUser(user database.User) {
 	fmt.Printf(" * ID:      %v\n", user.ID)
 	fmt.Printf(" * Name:    %v\n", user.Name)
 }
-
-
-

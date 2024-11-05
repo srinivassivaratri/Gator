@@ -1,5 +1,5 @@
 // Defines our module name and Go version
-module github.com/srinivassivaratri/RSSAggregator
+module github.com/srinivassivaratri/Gator
 
 // Minimum Go version needed
 go 1.22.4
