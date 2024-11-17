@@ -1,4 +1,4 @@
-# 🐊 Gator - The Ultimate Terminal RSS Feed Aggregator
+# 🐊 Gator
 
 Gator is a lightweight command-line tool built in Go that allows you to aggregate and read RSS feeds directly from your terminal. Stay updated with your favorite websites without ever leaving your command line!
 
@@ -12,6 +12,49 @@ Keeping up with numerous RSS feeds can be challenging, especially when most read
 - **Smart feed management**: Easily follow and unfollow feeds, with automatic updates.
 
 I built Gator to solve these problems, providing a simple CLI tool that fetches and displays RSS feeds directly in your terminal. No browser needed, no fancy UI—just your favorite content at your fingertips.
+
+## 🏗 Architecture
+
+```mermaid
+graph TD
+    A[main.go] --> B[commands.go]
+    B --> C1[handler_user.go]
+    B --> C2[handler_feed.go]
+    B --> C3[handler_follow.go]
+    B --> C4[handler_posts.go]
+    B --> C5[handler_agg.go]
+    B --> C6[handler_reset.go]
+    
+    C1 & C2 & C3 & C4 & C5 & C6 --> D[middleware.go]
+    D --> E[rss_feed.go]
+    D --> F[database.Queries]
+    
+    F --> G1[users.sql]
+    F --> G2[feeds.sql]
+    F --> G3[feed_follows.sql]
+    F --> G4[posts.sql]
+    
+    E --> H[RSS Sources]
+    G1 & G2 & G3 & G4 --> I[(PostgreSQL)]
+
+    style A fill:#00ff9f,stroke:#333,stroke-width:2px,color:black
+    style B fill:#00ff9f,stroke:#333,stroke-width:2px,color:black
+    style C1 fill:#00ff9f,stroke:#333,stroke-width:2px,color:black
+    style C2 fill:#00ff9f,stroke:#333,stroke-width:2px,color:black
+    style C3 fill:#00ff9f,stroke:#333,stroke-width:2px,color:black
+    style C4 fill:#00ff9f,stroke:#333,stroke-width:2px,color:black
+    style C5 fill:#00ff9f,stroke:#333,stroke-width:2px,color:black
+    style C6 fill:#00ff9f,stroke:#333,stroke-width:2px,color:black
+    style D fill:#00bfff,stroke:#333,stroke-width:2px,color:black
+    style E fill:#00bfff,stroke:#333,stroke-width:2px,color:black
+    style F fill:#00bfff,stroke:#333,stroke-width:2px,color:black
+    style G1 fill:#ff69b4,stroke:#333,stroke-width:2px,color:black
+    style G2 fill:#ff69b4,stroke:#333,stroke-width:2px,color:black
+    style G3 fill:#ff69b4,stroke:#333,stroke-width:2px,color:black
+    style G4 fill:#ff69b4,stroke:#333,stroke-width:2px,color:black
+    style H fill:#ffa500,stroke:#333,stroke-width:2px,color:black
+    style I fill:#ff69b4,stroke:#333,stroke-width:2px,color:black
+```
 
 ## 🚀 Quick Start
 
